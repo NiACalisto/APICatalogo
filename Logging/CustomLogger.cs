@@ -30,7 +30,7 @@ public class CustomLogger : ILogger
 
     private void WriteLogFile(string mensagem)
     {
-        string caminhoLogFile = @"D:\Desktop";
+        string caminhoLogFile = @"F:\ApiLogs\log.txt";
         using (StreamWriter streamWriter = new StreamWriter(caminhoLogFile, true))
         {
             try

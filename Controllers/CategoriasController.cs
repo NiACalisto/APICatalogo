@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using APICatalogo.Context;
 using APICatalogo.Models;
 using Microsoft.EntityFrameworkCore;
+using APICatalogo.Repositories;
 
 namespace APICatalogo.Controllers
 {
@@ -10,31 +11,27 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoriaRepository _repository;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(ICategoriaRepository repository)
         {
-            _context = context;
-        }
-
-        [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
-        {
-            return _context.Categorias.Include(p => p.Produtos).ToList();
+            _repository = repository;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _context.Categorias.AsNoTracking().ToList();
+            var categorias = _repository.GetCategorias();
+
+            return Ok(categorias);
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+            var categoria = _repository.GetCategoria(id);
 
-            if(categoria == null)
+            if(categoria is null)
             {
                 return NotFound();
             }
@@ -49,8 +46,7 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _context.Categorias.Add(categoria);
-            _context.SaveChanges();
+            _repository.CreateCategoria(categoria);
 
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
         }
@@ -63,8 +59,8 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(categoria).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            _repository.UpdateCategoria(id, categoria);
+            
             return Ok(categoria);
 
         }
@@ -72,14 +68,13 @@ namespace APICatalogo.Controllers
         [HttpDelete]
         public ActionResult Delete(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+            var categoria = _repository.GetCategoria(id);
 
             if(categoria == null)
             {
                 return NotFound();
             }
-            _context.Categorias.Remove(categoria);
-            _context.SaveChanges();
+            _repository.DeleteCategoria(id);
             return Ok(categoria);
         }
     }
