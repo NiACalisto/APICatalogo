@@ -59,7 +59,7 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.UpdateCategoria(id, categoria);
+            _repository.UpdateCategoria(categoria);
             
             return Ok(categoria);
 

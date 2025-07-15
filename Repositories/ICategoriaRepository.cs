@@ -10,7 +10,7 @@ public interface ICategoriaRepository
 
     Categoria CreateCategoria(Categoria categoria);
 
-    Categoria UpdateCategoria(int id, Categoria categoria);
+    Categoria UpdateCategoria(Categoria categoria);
 
     Categoria DeleteCategoria(int id);   
 }

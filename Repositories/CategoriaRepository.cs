@@ -49,7 +49,7 @@ public class CategoriaRepository : ICategoriaRepository
         return _context.Categorias.ToList();
     }
 
-    public Categoria UpdateCategoria(int id, Categoria categoria)
+    public Categoria UpdateCategoria(Categoria categoria)
     {
         if (categoria is null)
         {
