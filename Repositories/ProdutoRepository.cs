@@ -3,7 +3,7 @@ using APICatalogo.Models;
 using APICatalogo.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace APICatalogo.Repositoriesl;
+namespace APICatalogo.Repositories;
 
 public class ProdutoRepository : IProdutoRepository
 {
