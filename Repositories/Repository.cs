@@ -17,14 +17,14 @@ public class Repository<T> : IRepository<T> where T : class
     public T Create(T entity)
     {
         _appDbContext.Set<T>().Add(entity);
-        _appDbContext.SaveChanges();
+        
         return entity;  
     }
 
     public T Delete(T entity)
     {
         _appDbContext.Set<T>().Remove(entity);
-        _appDbContext.SaveChanges();
+        
         return entity;
     }
 
@@ -41,7 +41,7 @@ public class Repository<T> : IRepository<T> where T : class
     public T Update(T entity)
     {
         _appDbContext.Set<T>().Update(entity);
-        _appDbContext.SaveChanges();
+        
         return entity;
     }
 }
