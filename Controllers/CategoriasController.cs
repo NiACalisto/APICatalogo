@@ -11,17 +11,17 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly IRepository<Categoria> _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoriasController(IRepository<Categoria> repository)
+        public CategoriasController(IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;   
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _repository.GetAll().ToList();
+            var categorias = _unitOfWork.CategoriaRepository.GetAll().ToList();
 
             return Ok(categorias);
         }
@@ -29,7 +29,7 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _repository.Get(c => c.CategoriaId == id);
+            var categoria = _unitOfWork.CategoriaRepository.Get(c => c.CategoriaId == id);
 
             if(categoria is null)
             {
@@ -46,8 +46,8 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.Create(categoria);
-
+            _unitOfWork.CategoriaRepository.Create(categoria);
+            _unitOfWork.Commit();
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
         }
 
@@ -59,8 +59,8 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.Update(categoria);
-            
+            _unitOfWork.CategoriaRepository.Update(categoria);
+            _unitOfWork.Commit();
             return Ok(categoria);
 
         }
@@ -68,13 +68,14 @@ namespace APICatalogo.Controllers
         [HttpDelete]
         public ActionResult Delete(int id)
         {
-            var categoria = _repository.Get(c => c.CategoriaId == id);
+            var categoria = _unitOfWork.CategoriaRepository.Get(c => c.CategoriaId == id);
 
             if(categoria == null)
             {
                 return NotFound();
             }
-            _repository.Delete(categoria);
+            _unitOfWork.CategoriaRepository.Delete(categoria);
+            _unitOfWork.Commit();
             return Ok(categoria);
         }
     }

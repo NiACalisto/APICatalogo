@@ -13,43 +13,42 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutoRepository _repositoryProduto;
-        private readonly IRepository<Produto> _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProdutosController(IProdutoRepository repositoryProduto, IRepository<Produto> repository)
+        public ProdutosController(IUnitOfWork unitOfWork)
         {
-            _repositoryProduto = repositoryProduto;
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet("produtos/{id}")]
         public ActionResult<IEnumerable<Produto>> GetProdutosPorCategoria(int id)
         {
-            var produtosPorCategoria = _repositoryProduto.GetProdutosPorCategoria(id).ToList();
+            var produtosPorCategoria = _unitOfWork.ProdutoRepository.GetProdutosPorCategoria(id).ToList();
             if (produtosPorCategoria is null)
             {
                 return NotFound();
             }
-
+            
             return Ok(produtosPorCategoria);
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            return _repository.GetAll().ToList();
+            return _unitOfWork.ProdutoRepository.GetAll().ToList();
         }
 
         [HttpGet("{id:int:min(1)}", Name="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
-            return _repository.Get(c => c.ProdutoId == id);
+            return _unitOfWork.ProdutoRepository.Get(c => c.ProdutoId == id);
         }
 
         [HttpPost]
         public ActionResult Post(Produto produto)
         {   
-            var newProduto = _repository.Create(produto);
+            var newProduto = _unitOfWork.ProdutoRepository.Create(produto);
+            _unitOfWork.Commit();
 
             return new CreatedAtRouteResult("ObterProduto", new { id = newProduto.ProdutoId }, newProduto);
         }
@@ -61,20 +60,22 @@ namespace APICatalogo.Controllers
             {
                 return BadRequest();
             }
-            _repository.Update(produto);
+            _unitOfWork.ProdutoRepository.Update(produto);
+            _unitOfWork.Commit();
             return Ok(produto);
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var produto = _repository.Get(c => c.ProdutoId == id);
+            var produto = _unitOfWork.ProdutoRepository.Get(c => c.ProdutoId == id);
 
             if (produto == null)
             {
                 return NotFound();
             }
-            _repository.Delete(produto);
+            _unitOfWork.ProdutoRepository.Delete(produto);
+            _unitOfWork.Commit();
             return Ok(produto);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using APICatalogo.Context;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace APICatalogo.Repositories;
@@ -34,7 +35,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public IEnumerable<T> GetAll()
     {
-        return _appDbContext.Set<T>().ToList();
+        return _appDbContext.Set<T>().AsNoTracking().ToList();
     }
 
     public T Update(T entity)
