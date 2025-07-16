@@ -11,9 +11,9 @@ namespace APICatalogo.Controllers
     [ApiController]
     public class CategoriasController : ControllerBase
     {
-        private readonly ICategoriaRepository _repository;
+        private readonly IRepository<Categoria> _repository;
 
-        public CategoriasController(ICategoriaRepository repository)
+        public CategoriasController(IRepository<Categoria> repository)
         {
             _repository = repository;
         }
@@ -21,7 +21,7 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            var categorias = _repository.GetCategorias();
+            var categorias = _repository.GetAll().ToList();
 
             return Ok(categorias);
         }
@@ -29,7 +29,7 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name = "ObterCategoria")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c => c.CategoriaId == id);
 
             if(categoria is null)
             {
@@ -46,7 +46,7 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.CreateCategoria(categoria);
+            _repository.Create(categoria);
 
             return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
         }
@@ -59,7 +59,7 @@ namespace APICatalogo.Controllers
                 return BadRequest();
             }
 
-            _repository.UpdateCategoria(categoria);
+            _repository.Update(categoria);
             
             return Ok(categoria);
 
@@ -68,13 +68,13 @@ namespace APICatalogo.Controllers
         [HttpDelete]
         public ActionResult Delete(int id)
         {
-            var categoria = _repository.GetCategoria(id);
+            var categoria = _repository.Get(c => c.CategoriaId == id);
 
             if(categoria == null)
             {
                 return NotFound();
             }
-            _repository.DeleteCategoria(id);
+            _repository.Delete(categoria);
             return Ok(categoria);
         }
     }
